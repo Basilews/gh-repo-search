@@ -1,5 +1,5 @@
 <template lang="pug">
-  .search(v-bind:class="{ isFailed: isFailed }")
+  .search(v-bind:class="{ isFailed: isFailed || hasNoRepos }")
     .searchBox
       h1
         label(for="search") Search GH repos
@@ -9,11 +9,17 @@
         v-on:input="searchRepos"
         autofocus)
       ul.repos
-        li.repo(v-for="repo in repos" v-bind:key="repo.id") {{ repo.name }}
-        li.noResults(v-if="repos && !repos.length" v-on:click="showContributors")
+        li.repo(
+          v-for="repo in repos"
+          v-bind:key="repo.id"
+          v-on:click="fetchContributors"
+        ) {{ repo.name }}
+        li.noResults(v-if="isFailed")
           span.emoji 🙁
-          span no repositories have been found
-        //- li.noResults(v-if="") span.emoji🙁 span this user has no repos
+          span no user have been found
+        li.noResults(v-if="hasNoRepos")
+          span.emoji ☹️
+          span this user has no repos
 </template>
 
 <script>
@@ -21,27 +27,46 @@
     data: function() {
       return {
         repos: null,
+        contributors: null,
         isFailed: false,
+        hasNoRepos: false,
+        timer: null,
+        username: '',
       }
     },
     name: 'app-search',
     methods: {
       searchRepos: function(e) {
-        setTimeout(this.fetchUserRepos(e.target.value), 300);
+        const { value } = e.target;
+        this.username = value;
+
+        if (this.timer) clearTimeout(this.timer);
+        if (!value) {
+          this.isFailed = this.hasNoRepos = false;
+          return;
+        }
+        this.timer = setTimeout(() => this.fetchUserRepos(value), 350);
       },
       fetchUserRepos: function(username) {
-        const url = `https://api.github.com/users/${username}/repos?client_id=xxxx&client_secret=yyyy`;
+        const url = `https://api.github.com/users/${username}/repos`;
         fetch(url)
           .then(function(response) {
             if (response.status === 200) {
               response.json().then(function(data) {
                 this.repos = data;
-                this.isFailed = false;
+                if (data.length) {
+                  this.isFailed = this.hasNoRepos = false;
+                }
+                else {
+                  this.isFailed = false;
+                  this.hasNoRepos = true;
+                }
               }.bind(this));
             }
             else {
                 this.repos = [];
                 this.isFailed = true;
+                this.hasNoRepos = false;
             }
           }.bind(this))
           .catch(function() {
@@ -49,8 +74,23 @@
             this.isFailed = true;
           });
       },
-      showContributors: function() {
-        //
+      fetchContributors: function(e) {
+        const repo = e.target.innerHTML;
+        const url = `https://api.github.com/repos/${this.username}/${repo}/contributors`;
+        fetch(url)
+          .then(function(response) {
+            if (response.status === 200) {
+              response.json().then(function(data) {
+                this.contributors = data;
+              }.bind(this));
+            }
+            else {
+              //
+            }
+          }.bind(this))
+          .catch(function() {
+            console.warn('Something went wrong...');
+          })
       },
     }
   }
@@ -63,6 +103,7 @@
     height: 100%
     display: flex
     justify-content: center
+    align-items: center
     padding: 20px 10px
     background-image: radial-gradient(#e66465, #9198e5)
     z-index: 100
@@ -88,6 +129,7 @@
     position: relative
     display: flex
     flex-direction: column
+    margin-top: -80px
 
   h1
     margin-bottom: 10px
@@ -110,23 +152,23 @@
     position: absolute
     top: 70px
     width: 100%
-    max-height: calc(100% - 60px)
+    max-height: 305px
     overflow: scroll
 
   .repo
-    margin-left: 20px;
-    padding: 5px;
+    margin-left: 20px
+    padding: 5px
     color: white
     cursor: pointer
-    list-style-type: disc;
+    list-style-type: disc
 
     &:hover
       background-color: rgba(255, 255, 255, 0.1)
-      cursor: pointer;
+      cursor: pointer
 
   .noResults
-    display: flex;
-    align-items: center;
+    display: flex
+    align-items: center
     font-weight: 600
 
   .emoji
