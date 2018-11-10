@@ -59,5 +59,8 @@ module.exports = {
       template: 'index.html',
       inject: true
     })
-  ]
+  ],
+  resolve: {
+    extensions: ['.vue', '.js']
+  }
 }
