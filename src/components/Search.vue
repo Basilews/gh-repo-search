@@ -1,5 +1,7 @@
 <template lang="pug">
-  .search(v-bind:class="{ isFailed: isFailed || hasNoRepos }")
+  .search(
+    v-bind:class="{ isFailed: isFailed || hasNoRepos }"
+    role="search")
     .searchBox
       h1
         label(for="search") Search GH repos
@@ -7,20 +9,22 @@
         type="text"
         name="search"
         v-on:input="searchRepos"
+        v-on:focus="handleInputFocus"
+        v-on:blur="handleInputBlur"
         autofocus)
-      ul.repos
+      ul(v-bind:class="['repos', isOpened ? 'isOpened' : '']")
         li.repo(
           v-for="repo in repos"
           v-bind:key="repo.id"
-          v-on:click="fetchContributors"
+          v-on:mousedown="fetchContributors"
         ) {{ repo.name }}
-        li.noResults(v-if="isFailed")
-          span.emoji 🙁
-          span no user have been found
-        li.noResults(v-if="hasNoRepos")
-          span.emoji ☹️
-          span this user has no repos
-    Chart(v-if="contributors" :contributors="contributors")
+      div.noResults(v-if="isFailed")
+        span.emoji 🙁
+        span no user have been found
+      div.noResults(v-if="hasNoRepos")
+        span.emoji ☹️
+        span this user has no repos
+    Chart(v-if="contributors" :contributors="contributors" class="chart")
 </template>
 
 <script>
@@ -33,6 +37,7 @@
         contributors: null,
         isFailed: false,
         hasNoRepos: false,
+        isOpened: false,
         timer: null,
         username: '',
       }
@@ -62,6 +67,7 @@
                 this.repos = data;
                 if (data.length) {
                   this.isFailed = this.hasNoRepos = false;
+                  this.isOpened = true;
                 }
                 else {
                   this.isFailed = false;
@@ -81,6 +87,7 @@
           });
       },
       fetchContributors: function(e) {
+        console.log('fetching...')
         const repo = e.target.innerHTML;
         const url = `https://api.github.com/repos/${this.username}/${repo}/contributors`;
         fetch(url)
@@ -93,6 +100,12 @@
             console.warn('Something went wrong...');
           })
       },
+      handleInputFocus: function() {
+        this.isOpened = true;
+      },
+      handleInputBlur: function() {
+        this.isOpened = false;
+      }
     }
   }
 </script>
@@ -152,9 +165,13 @@
   .repos
     position: absolute
     top: 70px
+    display: none
     width: 100%
     max-height: 305px
     overflow: scroll
+
+    &.isOpened
+      display: block
 
   .repo
     margin-left: 20px
@@ -174,4 +191,7 @@
 
   .emoji
     height: 24px
+
+  .chart
+    margin-left: 10px
 </style>
