@@ -2,7 +2,7 @@
   .search(
     v-bind:class="{ isFailed: isFailed || hasNoRepos }"
     role="search")
-    .searchBox
+    .searchBox(v-bind:class="{ hasContributors: contributors }")
       h1
         label(for="search") Search GH repos
       input(
@@ -24,7 +24,11 @@
       div.noResults(v-if="hasNoRepos")
         span.emoji ☹️
         span this user has no repos
-    Chart(v-if="contributors" :contributors="contributors" class="chart")
+    Chart(
+      v-if="contributors"
+      :contributors="contributors"
+      v-bind:class="['chart', isOpened ? 'isOpened' : '']"
+    )
 </template>
 
 <script>
@@ -72,6 +76,7 @@
                 else {
                   this.isFailed = false;
                   this.hasNoRepos = true;
+                  this.contributors = false;
                 }
               }.bind(this));
             }
@@ -79,6 +84,7 @@
                 this.repos = [];
                 this.isFailed = true;
                 this.hasNoRepos = false;
+                this.contributors = false;
             }
           }.bind(this))
           .catch(function() {
@@ -87,7 +93,6 @@
           });
       },
       fetchContributors: function(e) {
-        console.log('fetching...')
         const repo = e.target.innerHTML;
         const url = `https://api.github.com/repos/${this.username}/${repo}/contributors`;
         fetch(url)
@@ -111,13 +116,15 @@
 </script>
 
 <style lang="sass" scoped>
+  $md-md: 662px
+
   .search
     position: relative
     width: 100%
     height: 100%
     display: flex
     justify-content: center
-    align-items: center
+    flex-wrap: wrap
     padding: 20px 10px
     background-image: radial-gradient(#e66465, #9198e5)
     z-index: 100
@@ -139,11 +146,22 @@
       &:before
         opacity: 1
 
+    @media (min-width: $md-md + 1)
+      align-items: center
+      flex-wrap: nowrap
+
   .searchBox
     position: relative
     display: flex
     flex-direction: column
-    margin-top: -80px
+    transition: margin-top .3s
+
+    &.hasContributors
+      @media (min-width: $md-md + 1)
+        margin-top: -240px
+
+    @media (max-width: $md-md)
+      margin-top: 0
 
   h1
     margin-bottom: 10px
@@ -169,6 +187,7 @@
     width: 100%
     max-height: 305px
     overflow: scroll
+    z-index: 1
 
     &.isOpened
       display: block
@@ -193,5 +212,13 @@
     height: 24px
 
   .chart
-    margin-left: 10px
+    max-width: 100%
+    box-sizing: border-box
+
+    &.isOpened
+      @media (max-width: $md-md)
+        filter: blur(3px) brightness(75%)
+
+    @media (min-width: $md-md + 1)
+      margin-left: 10px
 </style>

@@ -28,6 +28,8 @@
           ],
         },
         {
+          height: '400px',
+          responsive: true,
           legend: {
             labels: {
               fontColor: 'white',
@@ -63,7 +65,3 @@
     }
   }
 </script>
-
-<style lang="sass" scoped>
-
-</style>
