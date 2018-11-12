@@ -5,18 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --config build/webpack.config.dev.js"
+    "dev": "webpack-dev-server --config build/webpack.config.dev.js",
+    "build": "webpack --config build/webpack.config.dev.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Basilews/homeday-challenge.git"
+    "url": "git+https://github.com/Basilews/gh-repo-search.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Basilews/homeday-challenge/issues"
+    "url": "https://github.com/Basilews/gh-repo-search/issues"
   },
-  "homepage": "https://github.com/Basilews/homeday-challenge#readme",
+  "homepage": "https://github.com/Basilews/gh-repo-search#readme",
   "dependencies": {
     "chart.js": "^2.7.3",
     "style-loader": "^0.23.1",
