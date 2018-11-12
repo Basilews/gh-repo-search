@@ -24,11 +24,12 @@
       div.noResults(v-if="hasNoRepos")
         span.emoji ☹️
         span this user has no repos
-    Chart(
-      v-if="contributors"
-      :contributors="contributors"
-      v-bind:class="['chart', isOpened ? 'isOpened' : '']"
-    )
+    .chart-box(v-if="contributors" v-bind:class="{ isOpened }")
+      h3.repo-name {{ repo }}
+      Chart(
+        :contributors="contributors"
+        class="chart"
+      )
 </template>
 
 <script>
@@ -43,6 +44,7 @@
         hasNoRepos: false,
         isOpened: false,
         timer: null,
+        repo: '',
         username: '',
       }
     },
@@ -93,7 +95,7 @@
           });
       },
       fetchContributors: function(e) {
-        const repo = e.target.innerHTML;
+        const repo = this.repo = e.target.innerHTML;
         const url = `https://api.github.com/repos/${this.username}/${repo}/contributors`;
         fetch(url)
           .then(function(response) {
@@ -211,13 +213,22 @@
   .emoji
     height: 24px
 
-  .chart
-    max-width: 100%
-    box-sizing: border-box
+  .chart-box
+    transition: filter .2s linear
 
     &.isOpened
       @media (max-width: $md-md)
         filter: blur(3px) brightness(75%)
+
+  .repo-name
+    margin-bottom: 5px
+    color: white
+    text-align: center
+    text-decoration: underline
+
+  .chart
+    max-width: 100%
+    box-sizing: border-box
 
     @media (min-width: $md-md + 1)
       margin-left: 10px
