@@ -7,4 +7,6 @@ Simple repo search form for GitHub
 
 or
 
-- open dist/index.html in browser
+- open docs/index.html in browser
+
+![image of project](./docs/img/screenshot.png)
