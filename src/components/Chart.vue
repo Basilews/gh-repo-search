@@ -21,7 +21,7 @@
           labels: this.chartData.map(person => person.login),
           datasets: [
             {
-              label: 'Contributions',
+              label: 'contributions',
               backgroundColor: '#f87979',
               data: this.chartData.map(person => person.contributions)
             }

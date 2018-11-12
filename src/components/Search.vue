@@ -18,13 +18,20 @@
           v-bind:key="repo.id"
           v-on:mousedown="fetchContributors"
         ) {{ repo.name }}
-      div.noResults(v-if="isFailed")
-        span.emoji 🙁
-        span no user have been found
-      div.noResults(v-if="hasNoRepos")
-        span.emoji ☹️
-        span this user has no repos
-    .chart-box(v-if="contributors" v-bind:class="{ isOpened }")
+      .messageBox(v-bind:class="{ isOpened }")
+        .noResults(v-if="isFailed")
+          span.emoji 🙁
+          span no user have been found
+        .noResults(v-if="hasNoRepos")
+          span.emoji ☹️
+          span this user has no repos
+        .noResults(v-if="hasNoContributors")
+          span.emoji
+          span 😞 this repo has no contributors
+    .chart-box(
+      v-if="contributors"
+      v-bind:class="{ isOpened }"
+      )
       h3.repo-name {{ repo }}
       Chart(
         :contributors="contributors"
@@ -42,6 +49,7 @@
         contributors: null,
         isFailed: false,
         hasNoRepos: false,
+        hasNoContributors: false,
         isOpened: false,
         timer: null,
         repo: '',
@@ -100,7 +108,14 @@
         fetch(url)
           .then(function(response) {
             response.json().then(function(data) {
-              this.contributors = data;
+              if (data.length) {
+                this.contributors = data;
+                this.hasNoContributors = false;
+              }
+              else {
+                this.hasNoContributors = true;
+                this.contributors = null;
+              }
             }.bind(this));
           }.bind(this))
           .catch(function() {
@@ -108,7 +123,7 @@
           })
       },
       handleInputFocus: function() {
-        this.isOpened = true;
+        if (this.repos && this.repos.length) this.isOpened = true;
       },
       handleInputBlur: function() {
         this.isOpened = false;
@@ -205,13 +220,11 @@
       background-color: rgba(255, 255, 255, 0.1)
       cursor: pointer
 
-  .noResults
-    display: flex
-    align-items: center
-    font-weight: 600
+  .messageBox
+    transition: filter .2s linear
 
-  .emoji
-    height: 24px
+    &.isOpened
+      filter: blur(3px) brightness(75%)
 
   .chart-box
     transition: filter .2s linear
@@ -219,6 +232,14 @@
     &.isOpened
       @media (max-width: $md-md)
         filter: blur(3px) brightness(75%)
+
+  .noResults
+    display: flex
+    align-items: center
+    font-weight: 600
+
+  .emoji
+    height: 24px
 
   .repo-name
     margin-bottom: 5px
