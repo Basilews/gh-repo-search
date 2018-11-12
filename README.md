@@ -16,5 +16,5 @@ or
 
 ## Project stucture
 - `App.vue` component registration
-- `Chart.vue` component that renders bar chart with countritor list & contrubotions count
+- `Chart.vue` component that renders bar chart with countritor list & contributions count
 - `Search.vue` contains search box & app logic
