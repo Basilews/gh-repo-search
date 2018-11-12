@@ -175,7 +175,7 @@
 
     &.hasContributors
       @media (min-width: $md-md + 1)
-        margin-top: -240px
+        margin-top: -295px
 
     @media (max-width: $md-md)
       margin-top: 0

@@ -9,4 +9,4 @@ or
 
 - open `docs/index.html` in browser
 
-![image of project](./docs/img/screenshot.png)
+![image of project](./docs/img/screenshot.jpg)
