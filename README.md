@@ -1,5 +1,5 @@
 # GitHub Repo Searcher
-Simple repo search form for GitHub
+Simple repos search form for GitHub
 
 **Demo page**: https://basilews.github.io/gh-repo-search/
 
